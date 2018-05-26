@@ -10,7 +10,9 @@ setup(
     author_email='x.bustamante@ereuse.org',
     description='Tag database for eReuse.org',
     install_requires=[
-        'teal'
+        'teal',
+        'hashids',
+        'click'
     ],
     tests_requires=[
         'pytest'

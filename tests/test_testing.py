@@ -8,14 +8,16 @@ from teal.client import Client
 from teal.teal import Teal
 
 from ereuse_tag import Config
-from ereuse_tag.model import Tag, db
-from ereuse_tag.view import TagNotLinked
+from ereuse_tag.model import Tag, db, NoRemoteTag
 
 
 @pytest.fixture
 def app(request):
     class TestConfig(Config):
         SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/et_test'
+        TAG_PROVIDER_ID = 'FO'
+        TAG_HASH_SALT = 'So salty'
+        SERVER_NAME = 'foo.bar'
         TESTING = True
 
     app = Teal(config=TestConfig(), db=db)
@@ -35,21 +37,15 @@ def client(app: Teal) -> Client:
     return app.test_client()
 
 
-def test_create_tags_cli(runner: FlaskCliRunner, client: Client):
-    """Tests creating a tag."""
-    with NamedTemporaryFile('r+') as f:
-        result = runner.invoke(args=('create-tags', '100',
-                                     '--csv', f.name,
-                                     '--base-url', 'http://foo.bar'),
-                               catch_exceptions=False)
-        assert result.exit_code == 0
-        urls = tuple(csv.reader(f))
-        assert len(urls) == 100
-        for url, *_ in urls:
-            assert 'http://foo.bar/' in url
-            assert len(url) == 29
-            # Tag exists but it has not been linked
-            client.get(res=Tag.t, item=URL(url).path_parts[1], status=TagNotLinked)
+def test_tag_creation(app: Teal):
+    with app.app_context():
+        t = Tag()
+        db.session.add(t)
+        db.session.commit()
+        assert t.id
+        assert t.id.split('-')[0] == 'FO'
+        assert len(t.id.split('-')[1]) == 5
+        assert t.devicehub is None
 
 
 def test_get_not_linked_tag(app: Teal, client: Client):
@@ -59,10 +55,20 @@ def test_get_not_linked_tag(app: Teal, client: Client):
         db.session.add(t)
         db.session.commit()
         id = t.id
-    client.get(res=Tag.t, item=id, status=TagNotLinked)
+    client.get(res=Tag.t, item=id, status=NoRemoteTag)
 
 
-def test_link_tag():
-    """Tests linking and reading a linked tag."""
-    pass
-    # todo
+def test_create_tags_cli(runner: FlaskCliRunner, client: Client):
+    """Tests creating a tag."""
+    with NamedTemporaryFile('r+') as f:
+        result = runner.invoke(args=('create-tags', '100',
+                                     '--csv', f.name),
+                               catch_exceptions=False)
+        assert result.exit_code == 0
+        urls = tuple(csv.reader(f))
+        assert len(urls) == 100
+        for url, *_ in urls:
+            assert 'http://foo.bar/' in url
+            assert len(url) == 23
+            # Tag exists but it has not been linked
+            client.get(res=Tag.t, item=URL(url).path_parts[1], status=NoRemoteTag)
