@@ -51,7 +51,7 @@ class Tag(db.Model):
         return url
 
     def __repr__(self) -> str:
-        return '<Tag {0.id} device={0.device!r}>'.format(self)
+        return '<Tag {0.id} device={0.device_id}>'.format(self)
 
 
 class NoRemoteTag(BadRequest):

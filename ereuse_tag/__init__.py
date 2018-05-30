@@ -1,21 +1,20 @@
 import csv as csvm
+from pathlib import Path
+from typing import Iterable
 
 import click
 from boltons.urlutils import URL
 from click import IntRange, argument, option
-from ereuse_utils.naming import Naming
+from ereuse_tag.model import Tag, db
+from ereuse_tag.view import TagView
 from hashids import Hashids
 from sqlalchemy import between
 from teal.config import Config as TealConfig
 from teal.resource import Converters, Resource, url_for_resource
 
-from ereuse_tag.model import Tag, db
-from ereuse_tag.view import TagView
-
 
 class TagDef(Resource):
-    type = 'Tag'
-    resource = Naming.resource(type)
+    __type__ = 'Tag'
     ID_CONVERTER = Converters.string
     VIEW = TagView
     TAG_HASH_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -43,7 +42,7 @@ class TagDef(Resource):
     @option('--csv',
             type=click.Path(dir_okay=False, writable=True, resolve_path=True),
             help='The path of a CSV file to save the IDs.')
-    @argument('num', type=IntRange(1, 200))
+    @argument('num', type=IntRange(1))
     def create_tags(self, num: int, csv: str):
         """
         Creates NUM empty tags (only with the ID) and optionally saves
@@ -52,16 +51,16 @@ class TagDef(Resource):
         tags = tuple(Tag() for _ in range(num))
         db.session.add_all(tags)
         db.session.commit()
-        with open(csv, mode='w') as f:
-            csv_writer = csvm.writer(f)
-            for tag in tags:
-                csv_writer.writerow([url_for_resource(tag, tag.id)])
+        self.tags_to_csv(Path(csv), tags)
         print('Created all tags and saved them in the CSV {}'.format(csv))
 
+    @option('--csv',
+            type=click.Path(dir_okay=False, writable=True, resolve_path=True),
+            help='The path of a CSV file to save the tags that were set.')
     @argument('ending-tag', type=IntRange(2))
     @argument('starting-tag', type=IntRange(1))
     @argument('devicehub')
-    def set_tags(self, devicehub: str, starting_tag: int, ending_tag: int):
+    def set_tags(self, devicehub: str, starting_tag: int, ending_tag: int, csv: str):
         """
         "Sends" the tags to the specific devicehub,
         so they can only be linked in that devicehub.
@@ -75,9 +74,19 @@ class TagDef(Resource):
         """
         assert starting_tag < ending_tag
         assert URL(devicehub) and devicehub[-1] != '/', 'Provide a valid URL without leading slash'
-        db.update(Tag).where(between(Tag.id, starting_tag, ending_tag)).values(devicehub=devicehub)
+        tags = Tag.query.filter(between(Tag.id, starting_tag, ending_tag)).all()
+        for tag in tags:
+            tag.devicehub = devicehub
         db.session.commit()
+        self.tags_to_csv(Path(csv), tags)
         print('All tags set to {}'.format(devicehub))
+
+    @staticmethod
+    def tags_to_csv(path: Path, tags: Iterable[Tag]):
+        with path.open('w') as f:
+            csv_writer = csvm.writer(f)
+            for tag in tags:
+                csv_writer.writerow([url_for_resource(tag, tag.id)])
 
 
 class Config(TealConfig):
