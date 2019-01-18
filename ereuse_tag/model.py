@@ -3,10 +3,10 @@ from datetime import datetime
 from boltons.urlutils import URL
 from flask import current_app as app
 from sqlalchemy import Column, Sequence, types
-from teal.db import SQLAlchemy, URL as URLType, check_range
+from teal.db import URL as URLType, check_range
 from werkzeug.exceptions import BadRequest
 
-db = SQLAlchemy()
+from ereuse_tag.db import db
 
 
 class HashedIdFieldTag(types.TypeDecorator):

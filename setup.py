@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="ereuse-tag",
-    version='0.0.1',
+    version='0.0.1a1',
     packages=find_packages(),
     url='https://github.com/ereuse/tag',
     license='BSD',
@@ -10,9 +10,11 @@ setup(
     author_email='x.bustamante@ereuse.org',
     description='Tag database for eReuse.org',
     install_requires=[
-        'teal',
+        'click',
+        'marshmallow_enum',
         'hashids',
-        'click'
+        'teal>=0.2.0a25',
+        'psycopg2-binary'
     ],
     tests_requires=[
         'pytest'

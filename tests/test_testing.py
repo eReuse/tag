@@ -7,14 +7,14 @@ from flask.testing import FlaskCliRunner
 from teal.client import Client
 from teal.teal import Teal
 
-from ereuse_tag import Config
-from ereuse_tag.model import Tag, db, NoRemoteTag
+from ereuse_tag.config import Config
+from ereuse_tag.model import NoRemoteTag, Tag, db
 
 
 @pytest.fixture
 def app(request):
     class TestConfig(Config):
-        SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/et_test'
+        SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/tagtest'
         TAG_PROVIDER_ID = 'FO'
         TAG_HASH_SALT = 'So salty'
         SERVER_NAME = 'foo.bar'
@@ -61,8 +61,7 @@ def test_get_not_linked_tag(app: Teal, client: Client):
 def test_create_tags_cli(runner: FlaskCliRunner, client: Client):
     """Tests creating a tag."""
     with NamedTemporaryFile('r+') as f:
-        result = runner.invoke(args=('create-tags', '100',
-                                     '--csv', f.name),
+        result = runner.invoke(args=('create-tags', '100', '--csv', f.name),
                                catch_exceptions=False)
         assert result.exit_code == 0
         urls = tuple(csv.reader(f))
