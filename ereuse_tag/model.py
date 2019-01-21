@@ -1,9 +1,10 @@
-from datetime import datetime
-
+import teal.db
 from boltons.urlutils import URL
 from flask import current_app as app
 from sqlalchemy import Column, Sequence, types
+from sqlalchemy.ext.declarative import declared_attr
 from teal.db import URL as URLType, check_range
+from teal.resource import url_for_resource
 from werkzeug.exceptions import BadRequest
 
 from ereuse_tag.db import db
@@ -32,9 +33,18 @@ class Tag(db.Model):
                 Sequence('tag_id'),
                 check_range('id', 1, 10 ** 12),  # Imposed by QR size
                 primary_key=True)
-    devicehub = Column(URLType)
-    updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
-    created = db.Column(db.DateTime, default=datetime.utcnow)
+    devicehub = Column(URLType, comment='URL with the database')
+    type = Column(db.Unicode(), nullable=False, index=True)
+    updated = db.Column(db.TIMESTAMP(timezone=True),
+                        server_default=db.text('CURRENT_TIMESTAMP'),
+                        nullable=False)
+    created = db.Column(db.TIMESTAMP(timezone=True),
+                        server_default=db.text('CURRENT_TIMESTAMP'),
+                        nullable=False)
+
+    @property
+    def url(self):
+        return url_for_resource(self, self.id)
 
     @property
     def remote_tag(self) -> URL:
@@ -50,9 +60,43 @@ class Tag(db.Model):
         url.path_parts += 'tags', self.id
         return url
 
+    @declared_attr
+    def __mapper_args__(cls):
+        """
+        Defines inheritance.
+
+        From `the guide <http://docs.sqlalchemy.org/en/latest/orm/
+        extensions/declarative/api.html
+        #sqlalchemy.ext.declarative.declared_attr>`_
+        """
+        args = {teal.db.POLYMORPHIC_ID: cls.t}
+        if cls.t == 'Tag':
+            args[teal.db.POLYMORPHIC_ON] = cls.type
+        return args
+
     def __repr__(self) -> str:
         return '<Tag {0.id} device={0.device_id}>'.format(self)
 
 
+class ETag(Tag):
+    pass
+
+
 class NoRemoteTag(BadRequest):
     description = 'This tag has not been assigned to a Devicehub.'
+
+
+class Link(db.Model):
+    """A Link to an URL.
+
+    Stores URLs and provides a hashed ID back.
+    """
+    # todo develop
+    id = Column(HashedIdFieldTag, Sequence('link_id'), primary_key=True)
+    url = Column(URLType, nullable=False, unique=True)
+    updated = db.Column(db.TIMESTAMP(timezone=True),
+                        server_default=db.text('CURRENT_TIMESTAMP'),
+                        nullable=False)
+    created = db.Column(db.TIMESTAMP(timezone=True),
+                        server_default=db.text('CURRENT_TIMESTAMP'),
+                        nullable=False)

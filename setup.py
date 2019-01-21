@@ -13,7 +13,7 @@ setup(
         'click',
         'marshmallow_enum',
         'hashids',
-        'teal>=0.2.0a25',
+        'teal>=0.2.0a34',
         'psycopg2-binary'
     ],
     tests_requires=[

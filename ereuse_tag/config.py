@@ -1,3 +1,4 @@
+import boltons.urlutils
 import teal.config
 
 from ereuse_tag.definition import TagDef
@@ -18,7 +19,18 @@ class Config(teal.config.Config):
     If not set third-parties can decode the ID and get the number
     of the database behind it.
     """
+    DEVICEHUBS = {}
+    """
+    A dict of devicehubs that have access to this tag. Values are
+    the base url (scheme plus host) and keys are the token that
+    identifies them. 
+    """
 
-    def __init__(self, db: str = None) -> None:
+    def __init__(self) -> None:
         assert self.TAG_PROVIDER_ID, 'Set a TAG_PROVIDER_ID.'
-        super().__init__(db)
+        assert self.DEVICEHUBS, 'Set at least one Devicehub'
+        assert self.TAG_HASH_SALT, 'Set a Tag Hash salt'
+        for token, url in self.DEVICEHUBS.items():
+            assert url[-1] != '/', 'No final slash for Devicehub URL {}'.format(url)
+            self.DEVICEHUBS[token] = boltons.urlutils.URL(url)
+        super().__init__()
