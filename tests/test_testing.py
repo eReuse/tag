@@ -12,7 +12,7 @@ from werkzeug.exceptions import UnprocessableEntity
 from ereuse_tag import auth
 from ereuse_tag.auth import Auth
 from ereuse_tag.config import Config
-from ereuse_tag.model import NoRemoteTag, Tag, db
+from ereuse_tag.model import ETag, NoRemoteTag, Tag, db
 
 
 @pytest.fixture
@@ -48,9 +48,16 @@ def test_tag_creation(app: Teal):
         db.session.add(t)
         db.session.commit()
         assert t.id
-        assert t.id.split('-')[0] == 'FO'
-        assert len(t.id.split('-')[1]) == 5
         assert t.devicehub is None
+        assert t.id == '3MP5M'
+
+        et = ETag()
+        db.session.add(et)
+        db.session.commit()
+        assert et.id == 'FO-WNBRM'
+        assert et.id.split('-')[0] == 'FO'
+        assert len(et.id.split('-')[1]) == 5
+        assert et.devicehub is None
 
 
 def test_get_not_linked_tag(app: Teal, client: Client):
@@ -66,7 +73,7 @@ def test_get_not_linked_tag(app: Teal, client: Client):
 def test_create_tags_cli(runner: FlaskCliRunner, client: Client):
     """Tests creating a tag."""
     with NamedTemporaryFile('r+') as f:
-        result = runner.invoke(args=('create-tags', '100', '--csv', f.name),
+        result = runner.invoke(args=('create-tags', '100', '--csv', f.name, '--etag'),
                                catch_exceptions=False)
         assert result.exit_code == 0
         urls = tuple(csv.reader(f))

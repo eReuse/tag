@@ -5,7 +5,7 @@ from werkzeug.exceptions import UnprocessableEntity
 
 from ereuse_tag import auth
 from ereuse_tag.db import db
-from ereuse_tag.model import Tag
+from ereuse_tag.model import Tag, ETag
 
 
 class TagView(View):
@@ -15,7 +15,11 @@ class TagView(View):
         no device has been linked yet.
         :param id: ID of the Tag.
         """
-        tag = Tag.query.filter_by(id=id).one()  # type: Tag
+        try:
+            _id = ETag.decode(id)
+        except ValueError: # not an etag
+            _id = Tag.decode(id)
+        tag = Tag.query.filter_by(_id=_id).one()  # type: Tag
         return redirect(location=tag.remote_tag.to_text())
 
     @auth.Auth.requires_auth

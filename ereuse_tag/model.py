@@ -1,38 +1,21 @@
 import teal.db
 from boltons.urlutils import URL
-from flask import current_app as app
-from sqlalchemy import Column, Sequence, types
+from flask import current_app, current_app as app
+from sqlalchemy import Column, Sequence
 from sqlalchemy.ext.declarative import declared_attr
 from teal.db import URL as URLType, check_range
 from teal.resource import url_for_resource
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, UnprocessableEntity
 
 from ereuse_tag.db import db
 
 
-class HashedIdFieldTag(types.TypeDecorator):
-    """
-    A field that represents a BigInteger in the database and a
-    hashedID representation of it in python.
-    """
-    impl = types.BigInteger
-
-    def process_bind_param(self, value: str, dialect) -> int:
-        provider_id, hash = value.split('-')
-        assert provider_id == app.config['TAG_PROVIDER_ID'], \
-            'The tag does not belong to this provider ID'
-        return app.resources['Tag'].hashids.decode(hash)[0]
-
-    def process_result_value(self, value, dialect):
-        return '{}-{}'.format(app.config['TAG_PROVIDER_ID'],
-                              app.resources['Tag'].hashids.encode(value))
-
-
 class Tag(db.Model):
-    id = Column(HashedIdFieldTag,
-                Sequence('tag_id'),
-                check_range('id', 1, 10 ** 12),  # Imposed by QR size
-                primary_key=True)
+    _id = Column('id',
+                 db.BigInteger,
+                 Sequence('tag_id'),
+                 check_range('id', 1, 10 ** 12),  # Imposed by QR size
+                 primary_key=True)
     devicehub = Column(URLType, comment='URL with the database')
     type = Column(db.Unicode(), nullable=False, index=True)
     updated = db.Column(db.TIMESTAMP(timezone=True),
@@ -74,12 +57,40 @@ class Tag(db.Model):
             args[teal.db.POLYMORPHIC_ON] = cls.type
         return args
 
+    @property
+    def id(self):
+        return app.resources['Tag'].hashids.encode(self._id)
+
+    @id.setter
+    def id(self, id):
+        self._id = self.decode(id)
+
+    @classmethod
+    def decode(cls, id):
+        return current_app.resources['Tag'].hashids.decode(id)[0]
+
     def __repr__(self) -> str:
         return '<Tag {0.id} device={0.device_id}>'.format(self)
 
 
 class ETag(Tag):
-    pass
+    """
+    A tag of the form {TAG_PROVIDER_ID}-{HASH}.
+    """
+
+    @property
+    def id(self):
+        return '{}-{}'.format(app.config['TAG_PROVIDER_ID'], super().id)
+
+    @classmethod
+    def decode(cls, id):
+        try:
+            provider_id, hash = id.split('-')
+        except ValueError:
+            raise ValueError('Not an ETag.')
+        if provider_id != app.config['TAG_PROVIDER_ID']:
+            raise UnprocessableEntity('The tag does not belong to this provider ID')
+        return super().decode(hash)
 
 
 class NoRemoteTag(BadRequest):
@@ -92,7 +103,7 @@ class Link(db.Model):
     Stores URLs and provides a hashed ID back.
     """
     # todo develop
-    id = Column(HashedIdFieldTag, Sequence('link_id'), primary_key=True)
+    id = Column(db.BigInteger, Sequence('link_id'), primary_key=True)
     url = Column(URLType, nullable=False, unique=True)
     updated = db.Column(db.TIMESTAMP(timezone=True),
                         server_default=db.text('CURRENT_TIMESTAMP'),

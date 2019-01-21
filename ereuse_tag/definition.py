@@ -97,7 +97,7 @@ class TagDef(Resource):
         with path.open('w') as f:
             csv_writer = csvm.writer(f)
             for tag in tags:
-                csv_writer.writerow([url_for_resource(tag, tag.id)])
+                csv_writer.writerow([url_for_resource(Tag, tag.id)])
 
     @argument('csv', type=CLI_PATH)
     def export_tags(self, csv: Path):
