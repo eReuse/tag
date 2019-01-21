@@ -13,8 +13,7 @@ setup(
         'click',
         'marshmallow_enum',
         'hashids',
-        'teal>=0.2.0a34',
-        'psycopg2-binary'
+        'teal>=0.2.0a34'
     ],
     tests_requires=[
         'pytest'

@@ -1,0 +1,7 @@
+marshmallow==3.0.0b11
+marshmallow-enum==1.4.1
+SQLAlchemy==1.2.14
+SQLAlchemy-Utils==0.33.6
+hashids==1.2.0
+click==6.7
+teal==0.2.0a34
