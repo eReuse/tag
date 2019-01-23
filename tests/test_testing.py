@@ -98,6 +98,10 @@ def test_create_tags_endpoint_get(app: Teal, client: Client):
     assert response.location == 'https://dh.com/tags/{}'.format(res[0])
 
 
+def test_get_wrong_url(client: Client):
+    client.get('/', item='foobar', status=404, accept=ANY)
+
+
 def test_tag_export(runner: FlaskCliRunner, app: Teal):
     with app.app_context():
         t = Tag()

@@ -1,11 +1,11 @@
-from flask import redirect, request, g
+from flask import g, redirect, request
 from flask.json import jsonify
 from teal.resource import View
-from werkzeug.exceptions import UnprocessableEntity
+from werkzeug.exceptions import NotFound, UnprocessableEntity
 
 from ereuse_tag import auth
 from ereuse_tag.db import db
-from ereuse_tag.model import Tag, ETag
+from ereuse_tag.model import ETag, Tag
 
 
 class TagView(View):
@@ -17,8 +17,11 @@ class TagView(View):
         """
         try:
             _id = ETag.decode(id)
-        except ValueError: # not an etag
-            _id = Tag.decode(id)
+        except ValueError:  # not an etag
+            try:
+                _id = Tag.decode(id)
+            except ValueError:  # not a tag
+                raise NotFound()
         tag = Tag.query.filter_by(_id=_id).one()  # type: Tag
         return redirect(location=tag.remote_tag.to_text())
 

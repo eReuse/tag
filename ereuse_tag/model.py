@@ -67,7 +67,10 @@ class Tag(db.Model):
 
     @classmethod
     def decode(cls, id):
-        return current_app.resources['Tag'].hashids.decode(id)[0]
+        res = current_app.resources['Tag'].hashids.decode(id)
+        if not res:
+            raise ValueError('{} is not a valid Tag.'.format(id))
+        return res[0]
 
     def __repr__(self) -> str:
         return '<Tag {0.id} device={0.device_id}>'.format(self)
