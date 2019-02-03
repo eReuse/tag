@@ -16,6 +16,7 @@ class Tag(db.Model):
                  Sequence('tag_id'),
                  check_range('id', 1, 10 ** 12),  # Imposed by QR size
                  primary_key=True)
+    secondary = Column(db.Unicode)
     devicehub = Column(URLType, comment='URL with the database')
     type = Column(db.Unicode(), nullable=False, index=True)
     updated = db.Column(db.TIMESTAMP(timezone=True),
@@ -84,6 +85,10 @@ class ETag(Tag):
     @property
     def id(self):
         return '{}-{}'.format(app.config['TAG_PROVIDER_ID'], super().id)
+
+    @id.setter
+    def id(self, id):
+        self._id = self.decode(id)
 
     @classmethod
     def decode(cls, id):

@@ -104,11 +104,16 @@ def test_get_wrong_url(client: Client):
 
 def test_tag_export(runner: FlaskCliRunner, app: Teal):
     with app.app_context():
-        t = Tag()
+        t = ETag()
         db.session.add(t)
         db.session.commit()
     with NamedTemporaryFile('r+') as f:
-        result = runner.invoke(args=('export-tags', f.name), catch_exceptions=False)
+        result = runner.invoke(args=('export', f.name), catch_exceptions=False)
         assert result.exit_code == 0
-        result = runner.invoke(args=('import-tags', f.name), catch_exceptions=False)
+        result = runner.invoke(args=('import', f.name), catch_exceptions=False)
         assert result.exit_code == 0
+    with app.app_context():
+        t = Tag()
+        db.session.add(t)
+        db.session.commit()
+        assert Tag.decode(t.id) == 2
