@@ -117,3 +117,18 @@ def test_tag_export(runner: FlaskCliRunner, app: Teal):
         db.session.add(t)
         db.session.commit()
         assert Tag.decode(t.id) == 2
+
+
+def test_etag_secondary(client: Client, app: Teal):
+    """Tests creating, linking and accessing an ETag through
+    its secondary (NFC) id."""
+    with app.app_context():
+        et = ETag(secondary='NFCID')
+        db.session.add(et)
+        db.session.commit()
+    client.get('/', item='NFCID', accept=ANY, status=400)
+    with app.app_context():
+        tag = ETag.query.filter_by(secondary='NFCID').one()
+        tag.devicehub = URL('https://dh.com')
+        db.session.commit()
+    client.get('/', item='NFCID', accept=ANY, status=302)

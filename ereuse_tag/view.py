@@ -20,9 +20,13 @@ class TagView(View):
         except ValueError:  # not an etag
             try:
                 _id = Tag.decode(id)
-            except ValueError:  # not a tag
-                raise NotFound()
-        tag = Tag.query.filter_by(_id=_id).one()  # type: Tag
+            except ValueError:  # not the id of a tag
+                # Is the secondary ID?
+                tag = Tag.query.filter_by(secondary=id).one()
+            else:
+                tag = Tag.query.filter_by(_id=_id).one()  # type: Tag
+        else:
+            tag = Tag.query.filter_by(_id=_id).one()  # type: Tag
         return redirect(location=tag.remote_tag.to_text())
 
     @auth.Auth.requires_auth
