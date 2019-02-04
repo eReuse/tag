@@ -27,7 +27,7 @@ class TagView(View):
                 tag = Tag.query.filter_by(_id=_id).one()  # type: Tag
         else:
             tag = Tag.query.filter_by(_id=_id).one()  # type: Tag
-        return redirect(location=tag.remote_tag.to_text())
+        return redirect(location=tag.remote_device.to_text())
 
     @auth.Auth.requires_auth
     def post(self):

@@ -32,8 +32,7 @@ class Tag(db.Model):
 
     @property
     def remote_tag(self) -> URL:
-        """
-        The URL of the linked tag.
+        """The URL of the linked tag.
 
         :raise NoRemoteTag: The tag has not been set to a Devicehub.
         :return URL: This returns something like ``https://foo.bar/tags/XYZ``.
@@ -43,6 +42,13 @@ class Tag(db.Model):
         url = URL(self.devicehub)
         url.path_parts += 'tags', self.id
         return url
+
+    @property
+    def remote_device(self) -> URL:
+        """The URL of the linked device. See :meth:`.remote_tag`."""
+        tag_url = self.remote_tag
+        tag_url.path_parts += 'device',
+        return tag_url
 
     @declared_attr
     def __mapper_args__(cls):

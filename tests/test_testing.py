@@ -95,7 +95,7 @@ def test_create_tags_endpoint_get(app: Teal, client: Client):
     client.post({}, '/', query=[('num', -1)], token=token, status=UnprocessableEntity)
     client.post({}, '/', query=[('num', 101)], token=token, status=UnprocessableEntity)
     _, response = client.get('/', item=res[0], status=302, accept=ANY)
-    assert response.location == 'https://dh.com/tags/{}'.format(res[0])
+    assert response.location == 'https://dh.com/tags/{}/device'.format(res[0])
 
 
 def test_get_wrong_url(client: Client):
@@ -131,4 +131,5 @@ def test_etag_secondary(client: Client, app: Teal):
         tag = ETag.query.filter_by(secondary='NFCID').one()
         tag.devicehub = URL('https://dh.com')
         db.session.commit()
-    client.get('/', item='NFCID', accept=ANY, status=302)
+    _, r = client.get('/', item='NFCID', accept=ANY, status=302)
+    assert r.location == 'https://dh.com/tags/FO-3MP5M/device'
