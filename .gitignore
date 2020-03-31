@@ -107,5 +107,3 @@ ENV/
 # Other
 .idea/
 .DS_Store
-/app.py
-
