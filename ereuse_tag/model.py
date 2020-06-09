@@ -102,7 +102,7 @@ class ETag(Tag):
             provider_id, hash = id.split('-')
         except ValueError:
             raise ValueError('Not an ETag.')
-        if provider_id != app.config['TAG_PROVIDER_ID']:
+        if provider_id != app.config['TAG_PROVIDER_ID'].lower():
             raise UnprocessableEntity('The tag does not belong to this provider ID')
         return super().decode(hash)
 
