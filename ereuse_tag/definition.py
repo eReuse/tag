@@ -150,7 +150,7 @@ class VersionDef(Resource):
         super().__init__(app, import_name, static_folder, static_url_path, template_folder,
                          url_prefix, subdomain, url_defaults, root_path, cli_commands)
 
-        d = {'ereuse_tag': '0.1.0a'}
+        d = {'ereuse_tag': '0.0.1a1'}
         get = {'GET'}
 
         version_view = VersionView.as_view('VersionView', definition=self)

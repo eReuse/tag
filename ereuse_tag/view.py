@@ -50,5 +50,5 @@ class VersionView(View):
     def get(self, *args, **kwargs):
         """Get version."""
 
-        v = "{}".format(pkg_resources.require('ereuse_tag')[0].version)
+        v = "{}".format(pkg_resources.require('ereuse-tag')[0].version)
         return json.dumps({'ereuse_tag': v})
