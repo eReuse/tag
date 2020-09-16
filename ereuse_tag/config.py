@@ -9,9 +9,8 @@ from ereuse_tag.definition import TagDef, VersionDef
 
 class Config(teal.config.Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://dtag:ereuse@localhost/tag'  # type: str
-    RESOURCE_DEFINITIONS = set(chain(import_resource(TagDef),
-                                     import_resource(VersionDef)),
-                               )
+    RESOURCE_DEFINITIONS = TagDef, VersionDef
+
     TAG_PROVIDER_ID = None
     """
     The eReuse.org Tag Provider ID for this instance.
