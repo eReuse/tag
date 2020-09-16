@@ -1,6 +1,6 @@
 import csv as csvm
 from pathlib import Path
-from typing import Iterable
+from typing import Callable, Iterable, Tuple
 
 from boltons.urlutils import URL
 from click import IntRange, argument, option
@@ -10,7 +10,7 @@ from sqlalchemy import between
 from teal.resource import Converters, Resource, url_for_resource
 
 from ereuse_tag.model import ETag, Tag, db
-from ereuse_tag.view import TagView
+from ereuse_tag.view import TagView, VersionView
 
 
 class TagDef(Resource):
@@ -129,3 +129,29 @@ class TagDef(Resource):
                 max_id = max(max_id, cls.decode(id))
         db.session.execute('ALTER SEQUENCE tag_id RESTART WITH {}'.format(max_id + 1))
         db.session.commit()
+
+
+class VersionDef(Resource):
+    __type__ = 'Version'
+    SCHEMA = None
+    VIEW = None  # We do not want to create default / documents endpoint
+    AUTH = False
+
+    def __init__(self, app,
+                 import_name=__name__,
+                 static_folder=None,
+                 static_url_path=None,
+                 template_folder=None,
+                 url_prefix=None,
+                 subdomain=None,
+                 url_defaults=None,
+                 root_path=None,
+                 cli_commands: Iterable[Tuple[Callable, str or None]] = tuple()):
+        super().__init__(app, import_name, static_folder, static_url_path, template_folder,
+                         url_prefix, subdomain, url_defaults, root_path, cli_commands)
+
+        d = {'ereuse_tag': '0.1.0a'}
+        get = {'GET'}
+
+        version_view = VersionView.as_view('VersionView', definition=self)
+        self.add_url_rule('/version/', defaults=d, view_func=version_view, methods=get)

@@ -1,3 +1,6 @@
+import json
+import pkg_resources
+
 from flask import g, redirect, request
 from flask.json import jsonify
 from teal.resource import View
@@ -41,3 +44,11 @@ class TagView(View):
         response = jsonify(ids)
         response.status_code = 201
         return response
+
+
+class VersionView(View):
+    def get(self, *args, **kwargs):
+        """Get version."""
+
+        v = "{}".format(pkg_resources.require('ereuse_tag')[0].version)
+        return json.dumps({'ereuse_tag': v})
