@@ -1,8 +1,15 @@
+import re
+
 from setuptools import find_packages, setup
+
+
+with open("ereuse_tag/__init__.py", encoding="utf8") as f:
+    version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
+
 
 setup(
     name="ereuse-tag",
-    version='0.0.1a1',
+    version=version,
     packages=find_packages(),
     url='https://github.com/ereuse/tag',
     license='BSD',
