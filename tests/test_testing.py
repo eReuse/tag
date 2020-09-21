@@ -1,5 +1,5 @@
 import csv
-import pkg_resources
+import re
 from tempfile import NamedTemporaryFile
 
 import pytest
@@ -141,6 +141,8 @@ def test_get_version(app: Teal, client: Client):
     """Checks GETting versions of service."""
 
     content, res = client.get("/versions/version/", None)
-    tag_version = pkg_resources.require('ereuse-tag')[0].version
+    with open("ereuse_tag/__init__.py", encoding="utf8") as f:
+        version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
+    tag_version = version
     assert res.status_code == 200
     assert content == {'ereuse_tag': tag_version}

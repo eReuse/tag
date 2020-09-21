@@ -1,5 +1,5 @@
 import json
-import pkg_resources
+import re
 
 from flask import g, redirect, request
 from flask.json import jsonify
@@ -50,5 +50,7 @@ class VersionView(View):
     def get(self, *args, **kwargs):
         """Get version."""
 
-        v = "{}".format(pkg_resources.require('ereuse-tag')[0].version)
+        with open("ereuse_tag/__init__.py", encoding="utf8") as f:
+            version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
+        v = "{}".format(version)
         return json.dumps({'ereuse_tag': v})
