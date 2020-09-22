@@ -2,7 +2,6 @@ import boltons.urlutils
 import teal.config
 
 from itertools import chain
-from teal.utils import import_resource
 
 from ereuse_tag.definition import TagDef, VersionDef
 
