@@ -1,11 +1,11 @@
 import json
-import re
 
 from flask import g, redirect, request
 from flask.json import jsonify
 from teal.resource import View
 from werkzeug.exceptions import NotFound, UnprocessableEntity
 
+from ereuse_tag import __version__
 from ereuse_tag import auth
 from ereuse_tag.db import db
 from ereuse_tag.model import ETag, Tag
@@ -50,7 +50,5 @@ class VersionView(View):
     def get(self, *args, **kwargs):
         """Get version."""
 
-        with open("ereuse_tag/__init__.py", encoding="utf8") as f:
-            version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
-        v = "{}".format(version)
+        v = "{}".format(__version__)
         return json.dumps({'ereuse_tag': v})

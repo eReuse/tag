@@ -1,5 +1,4 @@
 import csv
-import re
 from tempfile import NamedTemporaryFile
 
 import pytest
@@ -10,6 +9,7 @@ from teal.client import Client
 from teal.teal import Teal
 from werkzeug.exceptions import UnprocessableEntity
 
+from ereuse_tag import __version__
 from ereuse_tag import auth
 from ereuse_tag.auth import Auth
 from ereuse_tag.config import Config
@@ -141,8 +141,6 @@ def test_get_version(app: Teal, client: Client):
     """Checks GETting versions of service."""
 
     content, res = client.get("/versions/version/", None)
-    with open("ereuse_tag/__init__.py", encoding="utf8") as f:
-        version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
-    tag_version = version
+
     assert res.status_code == 200
-    assert content == {'ereuse_tag': tag_version}
+    assert content == {'ereuse_tag': __version__}
