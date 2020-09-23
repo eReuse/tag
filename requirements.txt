@@ -14,7 +14,4 @@ colour==0.1.5
 psycopg2-binary==2.7.5
 webargs==4.0.0
 Werkzeug==0.14.1
-pytest==3.7.2
-pytest-runner==4.2
-alembic==1.4.2
 apispec==0.39.0
