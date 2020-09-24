@@ -50,5 +50,4 @@ class VersionView(View):
     def get(self, *args, **kwargs):
         """Get version."""
 
-        v = "{}".format(__version__)
-        return json.dumps({'ereuse_tag': v})
+        return json.dumps({'ereuse_tag': __version__})
