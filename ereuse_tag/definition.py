@@ -150,8 +150,8 @@ class VersionDef(Resource):
         super().__init__(app, import_name, static_folder, static_url_path, template_folder,
                          url_prefix, subdomain, url_defaults, root_path, cli_commands)
 
-        d = {'ereuse_tag': '0.0.0'}
+        defaults = {'ereuse_tag': '0.0.0'}
         get = {'GET'}
 
         version_view = VersionView.as_view('VersionView', definition=self)
-        self.add_url_rule('/version/', defaults=d, view_func=version_view, methods=get)
+        self.add_url_rule('/version/', defaults=defaults, view_func=version_view, methods=get)
