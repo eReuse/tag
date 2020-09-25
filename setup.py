@@ -1,8 +1,11 @@
 from setuptools import find_packages, setup
 
+from ereuse_tag import __version__
+
+
 setup(
     name="ereuse-tag",
-    version='0.0.1a1',
+    version=__version_,
     packages=find_packages(),
     url='https://github.com/ereuse/tag',
     license='BSD',

@@ -9,6 +9,7 @@ from teal.client import Client
 from teal.teal import Teal
 from werkzeug.exceptions import UnprocessableEntity
 
+from ereuse_tag import __version__
 from ereuse_tag import auth
 from ereuse_tag.auth import Auth
 from ereuse_tag.config import Config
@@ -18,7 +19,7 @@ from ereuse_tag.model import ETag, NoRemoteTag, Tag, db
 @pytest.fixture
 def app(request):
     class TestConfig(Config):
-        SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/tagtest'
+        SQLALCHEMY_DATABASE_URI = 'postgresql://dtag:ereuse@localhost/tagtest'
         TAG_PROVIDER_ID = 'FO'
         TAG_HASH_SALT = 'So salty'
         SERVER_NAME = 'foo.bar'
@@ -133,3 +134,13 @@ def test_etag_secondary(client: Client, app: Teal):
         db.session.commit()
     _, r = client.get('/', item='NFCID', accept=ANY, status=302)
     assert r.location == 'https://dh.com/tags/FO-3MP5M/device'
+
+
+@pytest.mark.mvp
+def test_get_version(app: Teal, client: Client):
+    """Checks GETting versions of service."""
+
+    content, res = client.get("/versions/version/", None)
+
+    assert res.status_code == 200
+    assert content == {'ereuse_tag': __version__}
