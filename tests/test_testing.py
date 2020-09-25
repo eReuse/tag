@@ -12,14 +12,14 @@ from werkzeug.exceptions import UnprocessableEntity
 from ereuse_tag import __version__
 from ereuse_tag import auth
 from ereuse_tag.auth import Auth
-from ereuse_tag.config import Config
+from ereuse_tag.config import TagsConfig
 from ereuse_tag.model import ETag, NoRemoteTag, Tag, db
 
 
 @pytest.fixture
 def app(request):
-    class TestConfig(Config):
-        SQLALCHEMY_DATABASE_URI = 'postgresql://dtag:ereuse@localhost/tagtest'
+    class TestConfig(TagsConfig):
+        SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/tagtest'
         TAG_PROVIDER_ID = 'FO'
         TAG_HASH_SALT = 'So salty'
         SERVER_NAME = 'foo.bar'
