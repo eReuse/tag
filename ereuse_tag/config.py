@@ -1,11 +1,11 @@
 import boltons.urlutils
-import teal.config
+from teal.config import Config
 
 from ereuse_tag.definition import TagDef
 
 
-class Config(teal.config.Config):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://dtag:ereuse@localhost/tag'  # type: str
+class TagsConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'postgresql://dtag:ereuse@localhost/tags'  # type: str
     RESOURCE_DEFINITIONS = TagDef,
     TAG_PROVIDER_ID = None
     """
@@ -25,6 +25,8 @@ class Config(teal.config.Config):
     the base url (scheme plus host) and keys are the token that
     identifies them. 
     """
+    API_DOC_CONFIG_TITLE = 'Tags'
+    API_DOC_CONFIG_VERSION = '0.1'
 
     def __init__(self) -> None:
         assert self.TAG_PROVIDER_ID, 'Set a TAG_PROVIDER_ID.'
