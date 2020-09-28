@@ -5,7 +5,7 @@ from ereuse_tag import __version__
 
 setup(
     name="ereuse-tag",
-    version=__version_,
+    version=__version__,
     packages=find_packages(),
     url='https://github.com/ereuse/tag',
     license='BSD',
