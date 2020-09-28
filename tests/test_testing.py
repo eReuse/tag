@@ -19,7 +19,8 @@ from ereuse_tag.model import ETag, NoRemoteTag, Tag, db
 @pytest.fixture
 def app(request):
     class TestConfig(TagsConfig):
-        SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/tagtest'
+        SQLALCHEMY_DATABASE_URI = 'postgresql://dtag:ereuse@localhost/tagtest'
+        # SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/tagtest'
         TAG_PROVIDER_ID = 'FO'
         TAG_HASH_SALT = 'So salty'
         SERVER_NAME = 'foo.bar'
