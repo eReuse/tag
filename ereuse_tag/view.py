@@ -1,8 +1,11 @@
+import json
+
 from flask import g, redirect, request
 from flask.json import jsonify
 from teal.resource import View
 from werkzeug.exceptions import NotFound, UnprocessableEntity
 
+from ereuse_tag import __version__
 from ereuse_tag import auth
 from ereuse_tag.db import db
 from ereuse_tag.model import ETag, Tag
@@ -41,3 +44,10 @@ class TagView(View):
         response = jsonify(ids)
         response.status_code = 201
         return response
+
+
+class VersionView(View):
+    def get(self, *args, **kwargs):
+        """Get version."""
+
+        return json.dumps({'ereuse_tag': __version__})

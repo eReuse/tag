@@ -23,4 +23,3 @@ class DeviceTagConf(TagsConfig):
 
 
 app = Teal(config=DeviceTagConf(), db=db, Auth=Auth)
-

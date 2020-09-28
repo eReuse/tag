@@ -1,12 +1,14 @@
 import boltons.urlutils
 from teal.config import Config
 
-from ereuse_tag.definition import TagDef
+from itertools import chain
+
+from ereuse_tag.definition import TagDef, VersionDef
 
 
 class TagsConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://dtag:ereuse@localhost/tags'  # type: str
-    RESOURCE_DEFINITIONS = TagDef,
+    RESOURCE_DEFINITIONS = TagDef, VersionDef
     TAG_PROVIDER_ID = None
     """
     The eReuse.org Tag Provider ID for this instance.
@@ -23,7 +25,7 @@ class TagsConfig(Config):
     """
     A dict of devicehubs that have access to this tag. Values are
     the base url (scheme plus host) and keys are the token that
-    identifies them. 
+    identifies them.
     """
     API_DOC_CONFIG_TITLE = 'Tags'
     API_DOC_CONFIG_VERSION = '0.1'
