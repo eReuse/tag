@@ -24,6 +24,11 @@ Create a PostgreSQL database called *tags* by running
 1. `sudo su - postgres`
 2. `bash {absolute-path}/examples/create-db.sh tags dtag`
 
+Configure project using environment file (you can use provided example as quickstart):                    
+.. code:: bash 
+   
+   $ cp examples/env.example .env
+
 ## Running
 Download, or copy the contents, of [this file](examples/app.py), and
 call the new file ``app.py``.
