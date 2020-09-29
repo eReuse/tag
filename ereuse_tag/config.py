@@ -1,13 +1,19 @@
 import boltons.urlutils
-from teal.config import Config
-
+from decouple import config
 from itertools import chain
+
+from teal.config import Config
 
 from ereuse_tag.definition import TagDef, VersionDef
 
 
 class TagsConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://dtag:ereuse@localhost/tags'  # type: str
+    DB_USER = config('DB_USER', 'dtag')
+    DB_PASSWORD = config('DB_PASSWORD', 'ereuse')
+    DB_HOST = config('DB_HOST', 'localhost')
+    DB_DATABASE = config('DB_DATABASE', 'tags')
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{pw}@{host}/{db}'.format(
+        user=DB_USER, pw=DB_PASSWORD, host=DB_HOST, db=DB_DATABASE)  #type: str
     RESOURCE_DEFINITIONS = TagDef, VersionDef
     TAG_PROVIDER_ID = None
     """
