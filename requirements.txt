@@ -1,5 +1,5 @@
 apispec==0.39.0
-marshmallow==3.0.0rc4
+marshmallow==3.0.0b11
 marshmallow-enum==1.4.1
 SQLAlchemy==1.2.14
 SQLAlchemy-Utils==0.33.6
