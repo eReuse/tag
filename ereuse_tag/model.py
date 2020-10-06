@@ -13,7 +13,7 @@ from ereuse_tag.db import db
 class Tag(db.Model):
     _id = Column('id',
                  db.BigInteger,
-                 Sequence('tag_id'),
+                 Sequence('tag_id_seq'),
                  check_range('id', 1, 10 ** 12),  # Imposed by QR size
                  primary_key=True)
     secondary = Column(db.Unicode)
@@ -117,7 +117,7 @@ class Link(db.Model):
     Stores URLs and provides a hashed ID back.
     """
     # todo develop
-    id = Column(db.BigInteger, Sequence('link_id'), primary_key=True)
+    id = Column(db.BigInteger, Sequence('link_id_seq'), primary_key=True)
     url = Column(URLType, nullable=False, unique=True)
     updated = db.Column(db.TIMESTAMP(timezone=True),
                         server_default=db.text('CURRENT_TIMESTAMP'),
