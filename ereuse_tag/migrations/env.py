@@ -4,9 +4,6 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import create_engine
 
-from ereuse_tag.config import TagsConfig
-from ereuse_tag.model import Tag, Link
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -20,7 +17,10 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-target_metadata = [Tag.metadata, Link.metadata]
+from ereuse_tag.config import TagsConfig
+# from ereuse_tag.model import Base
+from ereuse_tag.db import db
+target_metadata = db.Model.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

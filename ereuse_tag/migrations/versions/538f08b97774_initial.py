@@ -1,17 +1,18 @@
-"""create table
+"""initial
 
-Revision ID: 3e0111bd1622
-Revises: 33559e5fa329
-Create Date: 2020-10-06 17:23:53.755619
+Revision ID: 538f08b97774
+Revises:
+Create Date: 2020-10-06 17:46:01.737885
 
 """
+import teal
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3e0111bd1622'
-down_revision = '33559e5fa329'
+revision = '538f08b97774'
+down_revision = None
 branch_labels = None
 depends_on = None
 
